@@ -1,0 +1,15 @@
+http://pgsql.tapoueh.org/site/html/news/20080131.bloat.html
+
+http://www.pgcon.org/2009/schedule/events/153.en.html
+
+https://github.com/bucardo/check_postgres/blob/master/check_postgres.pl
+
+http://labs.omniti.com/labs/pgtreats/browser/trunk/tools
+
+http://xzilla.herokuapp.com/blog/2008/Jul/Index-pruning-techniques.html
+
+http://hype-free.blogspot.com.br/2008/09/finding-unused-indexes-in-postgresql.html
+
+http://it.toolbox.com/blogs/database-soup/finding-useless-indexes-28796
+
+https://jmorano.moretrix.com/
