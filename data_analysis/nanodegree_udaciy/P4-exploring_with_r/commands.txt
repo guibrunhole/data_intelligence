@@ -1,0 +1,8 @@
+> getwd()
+[1] "/nanodegree/project_4"
+> setwd('/guibrunhole/data_intelligence/data_analysis/nanodegree_udaciy/P4-exploring_with_r')
+> getwd()
+[1] "/guibrunhole/data_intelligence/data_analysis/nanodegree_udaciy/P4-exploring_with_r"
+> statesInfo <- read.csv('stateData.csv')
+> View(statesInfo)
+
