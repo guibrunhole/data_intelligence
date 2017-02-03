@@ -160,11 +160,11 @@ import pprint
 import re
 import xml.etree.cElementTree as ET
 
-import cerberus
+#import cerberus
 
 import schema
 
-OSM_PATH = "example.osm"
+OSM_PATH = "sample.osm"
 
 NODES_PATH = "nodes.csv"
 NODE_TAGS_PATH = "nodes_tags.csv"
@@ -194,7 +194,45 @@ def shape_element(element, node_attr_fields=NODE_FIELDS, way_attr_fields=WAY_FIE
     way_nodes = []
     tags = []  # Handle secondary tags the same way for both node and way elements
 
-    # YOUR CODE HERE
+    id = 0
+    if element.tag == 'node':
+        node_attribs = {} 
+        b = element.attrib
+        b['id'] = int(b['id'])
+        b['lat'] = float(b['lat'])
+        b['lon'] = float(b['lon'])
+        b['uid'] = int(b['uid'])
+        b['changeset'] = int(b['changeset'])
+        node_attribs = b
+        id = node_attribs['id']
+    elif element.tag == 'way':
+        way_attribs = element.attrib
+        b = element.attrib
+        b['id'] = int(b['id'])
+        b['uid'] = int(b['uid'])
+        b['changeset'] = int(b['changeset'])
+        way_attribs = b
+        id = way_attribs['id']
+
+    for c_elem in element:
+        nd_count = 0
+        if c_elem.tag == 'tag':
+            tag = {}
+            tag['key'] = c_elem.attrib['k']
+            if (':' in tag['key']):
+              spl = tag['key'].split(':',1)
+              tag['key'] = spl[1]
+              tag['type'] = spl[0]
+            tag['value'] = c_elem.attrib['v']
+            tag['id'] = id
+            tags.append(tag)
+        elif c_elem.tag == 'nd':
+            nd = {}
+            nd['node_id'] = int(c_elem.attrib['ref'])
+            nd['position'] = nd_count
+            nd_count = nd_count + 1
+            way_nodes.append(nd)
+
     if element.tag == 'node':
         return {'node': node_attribs, 'node_tags': tags}
     elif element.tag == 'way':
@@ -256,20 +294,21 @@ def process_map(file_in, validate):
         way_nodes_writer = UnicodeDictWriter(way_nodes_file, WAY_NODES_FIELDS)
         way_tags_writer = UnicodeDictWriter(way_tags_file, WAY_TAGS_FIELDS)
 
-        nodes_writer.writeheader()
-        node_tags_writer.writeheader()
-        ways_writer.writeheader()
-        way_nodes_writer.writeheader()
-        way_tags_writer.writeheader()
+        # nodes_writer.writeheader()
+        # node_tags_writer.writeheader()
+        # ways_writer.writeheader()
+        # way_nodes_writer.writeheader()
+        # way_tags_writer.writeheader()
 
-        validator = cerberus.Validator()
+        #validator = cerberus.Validator()
 
         for element in get_element(file_in, tags=('node', 'way')):
             el = shape_element(element)
+            # print (el)
             if el:
                 if validate is True:
-                    validate_element(el, validator)
-
+                    #validate_element(el, validator)
+                    1
                 if element.tag == 'node':
                     nodes_writer.writerow(el['node'])
                     node_tags_writer.writerows(el['node_tags'])
