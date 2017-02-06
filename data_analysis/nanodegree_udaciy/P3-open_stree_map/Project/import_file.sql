@@ -6,7 +6,7 @@ sqllite3
 .mode csv
 
 ## node
-.import nodes.csv node
+.import nodes.csv nodes
 
 ## ways
 .import ways.csv ways

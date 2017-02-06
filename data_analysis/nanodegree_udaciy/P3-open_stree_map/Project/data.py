@@ -15,7 +15,7 @@ import xml.etree.cElementTree as ET
 
 import schema
 
-OSM_PATH = "sample.osm"
+OSM_PATH = "dataset/sao-paulo_brazil.osm"
 
 NODES_PATH = "nodes.csv"
 NODE_TAGS_PATH = "nodes_tags.csv"

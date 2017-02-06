@@ -76,3 +76,8 @@ qplot(data = pf, x = friend_count, binwidth = 25)
       + (scale_x_continuous(limits = c(0,1000), breaks = seq(0,1000,50)))
       + facet_wrap(~gender)
 
+ 
+## count by gender
+table(pf$gender) 
+
+
