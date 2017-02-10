@@ -61,6 +61,67 @@
  11  |   3   
 </code></pre>
 <p>Here, in Brazil, ours postal codes/zipcodes has 9 characters (<a href="https://www.correios.com.br/para-voce/correios-de-a-a-z/cep-codigo-de-enderecamento-postal">see here</a>).</p>
+<p> So, I decided to correct this records. In postalcode with 8 characters I'll do an update to input the trace ('-'), for the others, I'll delete them.
+</p>
+<pre><code class="language-sql"><span class="hljs-operator"><span class="hljs-keyword">UPDATE nodes_tags</span> 
+<span class="hljs-keyword">SET</span>
+    value = SUBSTR(value,1,5)||'-'||SUBSTR(value,6,8)
+<span class="hljs-keyword">WHERE</span> 
+    <span class="hljs-keyword">key</span> = <span class="hljs-string">'postcode'</span> 
+    <span class="hljs-keyword">AND LENGTH</span> = <span class="hljs-string">8</span>
+</code></pre>
+
+<pre><code class="language-sql"><span class="hljs-operator"><span class="hljs-keyword">DELETE nodes_tags</span> 
+<span class="hljs-keyword">WHERE</span> 
+    <span class="hljs-keyword">key</span> = <span class="hljs-string">'postcode'</span> 
+    <span class="hljs-keyword">AND LENGTH</span> NOT IN <span class="hljs-string">(9)</span>
+</code></pre>
+
+<p>Now, I can see only valid postcodes :)</p>
+<pre><code class="language-sql"><span class="hljs-operator"><span class="hljs-keyword">SELECT</span> 
+    <span class="hljs-keyword">LENGTH</span>(<span class="hljs-keyword">value</span>) <span class="hljs-keyword">size</span>
+    ,<span class="hljs-keyword">COUNT</span>(*) total 
+<span class="hljs-keyword">FROM</span>
+    nodes_tags 
+<span class="hljs-keyword">WHERE</span> 
+    <span class="hljs-keyword">key</span> = <span class="hljs-string">'postcode'</span> 
+<span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> <span class="hljs-keyword">LENGTH</span>(<span class="hljs-keyword">value</span>);</span></code></pre>
+
+<p>The result is:</p>
+<pre><code class="language-plain-text">size | total  
+ 9   | 9544
+</code></pre>
+
+<h2>Other fields</h2>
+<p>I did some vailitions with <strong>Latitude</strong> and <strong>Longitude</strong>. Here I didn't find any problem. I wrote this query to see it: </p>
+<pre><code class="language-sql"><span class="hljs-operator"><span class="hljs-keyword">SELECT MAX(lat), MIN(lat), MAX(lon), MIN(lon) FROM nodes;</span></span></code></pre>
+<p>The result is:</p>
+<pre><code class="language-plain-text">MAX(lat) | MIN(lat)   |   MAX(lon)  | MIN(lon)
+ -23.125 | -24.316998 | -45.8630009 | -47.357
+</code></pre>
+<p>So we can note that everything's ok with those fields :)</p>
+
+<p><strong>Let's check the citie's name :)</strong></p>
+
+<pre><code class="language-sql"><span class="hljs-operator"><span class="hljs-keyword">SELECT DISTINCT value FROM nodes_tags WHERE key = 'city' ORDER BY 1 DESC;</span></span></code></pre>
+
+<p>Here I found many many many problems :(</p>
+<p>For example, the city "São Paulo" had 15 differents names, or better, 15 differents writing. And I found one zipcode too. To correct the zipcode is easy, a simple update is ok. But to correct the cities's name is necessary list all names and put in a update. See below how I did:</p>
+
+<pre><code class="language-sql"><span class="hljs-operator"><span class="hljs-keyword">UPDATE nodes_tags SET key = 'postcode' WHERE value = '06097-100' AND key = 'city';</span></span></code></pre>
+
+<pre><code class="language-sql"><span class="hljs-operator"><span class="hljs-keyword">UPDATE nodes_tags SET value = 'São Paulo'
+WHERE value IN 
+('São Paulol','São Paulo, SP','São Paulo - SP','São Paulo',
+'Sao paulo','Sao Paulo','Sao Paolo','São Pailo','Sâo Paulo',
+'SÃO PAULO','São paulo','são paulo','são Paulo','sp','sao paulo')
+AND key = 'city';
+</span></span></code></pre>
+
+<p>I was run a <strong>Count Distinct</strong> on <strong>value</strong> field.
+First the result was <strong>80</strong> and now is <strong>65</strong>. :)</p>
+<pre><code class="language-sql"><span class="hljs-operator"><span class="hljs-keyword">SELECT COUNT(DISTINCT value) FROM nodes_tags WHERE key = 'city';</span></span></code></pre>
+
 <h2><a id="Data_Overview_and_Additional_Ideas_73"></a>Data Overview and Additional Ideas</h2>
 <ul>
 <li><strong>Files sizes</strong></li>
@@ -244,8 +305,16 @@ I guess that is very important to know if you don’t know nothing in the city :
 <h2><a id="Conclusion"></a>Conclusion</h2>
 </ul>
 <ul>
-After completing this project, I conclude that although the OpenStreetMap data is very useful and has a lot of important information, I believe it can still be improved. Improved both in the validation of the information that is entered, as well as in a better engagement of the users.
-I liked this work very much, I did not know that this data existed and it was public: D
+<p>After completing this project, I conclude that although the OpenStreetMap data is very useful and has a lot of important information, I believe it can still be improved. Improved both in the validation of the information that is entered, as well as in a better engagement of the users.</p>
+
+<p>I founded many irregularities on data that made some analysis more difficult, for example the city's name. I guess that for important value (like this), the OSM could be more boring with the user and accept only right things, not anyone.</p>
+
+<p>For users engagement, I guess that OSM could nominate the top contributer users like "the king of the city" and something like that. Today many companies use gamification to have more engagement. Yes, is very nice have billion of users in your base, but what is it for if none user is engaged? 
+In my opinion, if OSM start to do this, they'll have more trustly users in her base and, consequently, her informations will be more reliable :)</p>
+
+<p>Isn't easy validate all data, but one simple validation proccess could do a big difference for us, data analysts. If OSM did this routine once per week, for example, I guess that everybody that use her data will be very happy and, possible, would recomender this tool for more people. If you have a great product, you don't need to do marketing, your users will do that for you :)</p>
+
+<p>I liked this work very much, I did not know that this data existed and it was public: D</p>
 </ul>
 
 </body></html>

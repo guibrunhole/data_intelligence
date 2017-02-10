@@ -41,15 +41,3 @@ CREATE TABLE ways_nodes (
     FOREIGN KEY (id) REFERENCES ways(id),
     FOREIGN KEY (node_id) REFERENCES nodes(id)
 );
-
-UPDATE nodes_tags
-SET key = 'postcode'
-WHERE value = '06097-100' AND key = 'city';
-
-UPDATE nodes_tags
-SET value = 'São Paulo'
-WHERE value IN 
-('"São Paulol"','"São Paulo, SP"','"São Paulo - SP"','"São Paulo"',
-'"Sao paulo"','"Sao Paulo"','"Sao Paolo"','"São Pailo"','"Sâo Paulo"',
-'"SÃO PAULO"','"São paulo"','"são paulo"','"são Paulo"','sp','"sao paulo"')
-AND key = 'city';
