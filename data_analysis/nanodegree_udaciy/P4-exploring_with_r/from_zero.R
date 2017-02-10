@@ -81,3 +81,49 @@ qplot(data = pf, x = friend_count, binwidth = 25)
 table(pf$gender) 
 
 
+##############################################################################
+
+### DAY 4
+
+by(pf$friend_count, pf$gender, summary)
+
+## with gplot
+ggplot(aes(x = tenure), data = pf) + 
+  geom_histogram(binwidth = 30, color = 'black', fill = '#099DD9')
+
+##with qplot
+qplot(x = tenure/365, data = pf, binwidth = .25,
+      color = I('black'), fill = I('#F79420')) +
+      scale_x_continuous(breaks = seq(1, 7, 1), limits = c(0, 7)) +
+      xlab('Number of years using Facebook') + 
+      ylab('Number of users in sample')
+
+## age histogram
+qplot(x = age, data = pf, binwidth = 1,
+      color = I('black'), fill = I('#F23512')) +
+      xlab('Age of Facebook users') + 
+      ylab('Number of users in sample')
+
+## multiples plots in onde graph
+install.packages('gridExtra') 
+library(gridExtra) 
+
+summary(pf$friend_count)
+
+summary(log10(pf$friend_count +1))
+
+summary(sqrt(pf$friend_count))
+
+## friend_count
+qplot(x = friend_count, data = pf, binwidth = 1,
+      color = I('black'), fill = I('#F79420'))
+
+## using log10
+qplot(x = friend_count, data = pf, binwidth = 1,
+      color = I('black'), fill = I('#F79420')) +
+      scale_y_log10()
+
+## using sqrt
+qplot(x = friend_count, data = pf, binwidth = 1,
+      color = I('black'), fill = I('#F79420')) +
+      scale_y_sqrt()
