@@ -18,4 +18,14 @@ sqllite3
 .import ways_tags.csv ways_tags
 
 ## ways_nodes
-.import ways_nodes.csv ways_nodes
+.import ways_nodes.csv 
+
+
+---
+
+UPDATE nodes_tags
+SET
+	value = SUBSTR(value,1,5)||'-'||SUBSTR(value,6,8)
+WHERE
+	LENGTH(value) = 8
+	AND key = 'postcode';
