@@ -115,15 +115,105 @@ summary(log10(pf$friend_count +1))
 summary(sqrt(pf$friend_count))
 
 ## friend_count
-qplot(x = friend_count, data = pf, binwidth = 1,
-      color = I('black'), fill = I('#F79420'))
+p1 <- qplot(x = friend_count, data = pf)
 
 ## using log10
-qplot(x = friend_count, data = pf, binwidth = 1,
-      color = I('black'), fill = I('#F79420')) +
-      scale_y_log10()
+p2 <- qplot(x = friend_count, data = pf) + scale_y_log10()
 
 ## using sqrt
-qplot(x = friend_count, data = pf, binwidth = 1,
-      color = I('black'), fill = I('#F79420')) +
-      scale_y_sqrt()
+p3 <- qplot(x = friend_count, data = pf) + scale_y_sqrt()
+
+grid.arrange(p1,p2,p3,ncol =1)
+
+##############################################################################
+
+### DAY 5
+
+## add a scaling layer
+
+logScale <- qplot(x = log10(friend_count), data = pf)
+
+countScale <- ggplot(aes(x = friend_count), data = pf) +
+  geom_histogram() +
+  scale_x_log10()
+
+grid.arrange(logScale, countScale, ncol = 2)
+
+## Frequency Polygons (before we had histograms)
+
+qplot( x = friend_count, data = subset(pf, !is.na(gender)),
+    binwidth = 10) +
+  scale_x_continuous(lim = c(0,1000), breaks = seq(0,1000,50)) +
+  facet_wrap(~gender)
+
+qplot( x = friend_count, y = ..count../sum(..count..),
+       data = subset(pf, !is.na(gender)),
+       xlab = 'Friend Count',
+       ylab = 'Proportion of Users with that friend count',
+       binwidth = 10, geom = 'freqpoly', color = gender) +
+  scale_x_continuous(lim = c(0,1000), breaks = seq(0,1000,50))
+
+aggregate(pf$www_likes, by=list(pf$gender), sum)
+
+qplot(x = www_likes, data = subset(pf, !is.na(gender)),
+    geom = 'freqpoly', color = gender) +
+    scale_x_continuous() +
+    scale_x_log10()
+
+by(pf$www_likes, pf$gender, sum)
+
+## Box Plots
+qplot( x = gender, y = friend_count,
+       data = subset(pf, !is.na(gender)),
+       geom = 'boxplot') +
+        coord_cartesian(ylim = c(0,250))
+
+qplot( x = gender, y = friend_count,
+       data = subset(pf, !is.na(gender)),
+       geom = 'boxplot', ylim = c(0,1000)) +
+  scale_y_continuous(limits = c(0,1000))
+
+by(pf$friend_count, pf$gender, summary)
+
+## Getting Logical
+
+summary(pf$mobile_likes)
+
+summary(pf$mobile_likes > 0)
+
+mobile_check_in <- NA
+pf$mobile_check_in <- ifelse(pf$mobile_likes > 0, 1, 0)
+pf$mobile_check_in <- factor(pf$mobile_check_in)
+summary(pf$mobile_check_in)
+
+63947/(35056+63947)
+
+sum(pf$mobile_check_in == 1)/length(pf$mobile_check_in)
+
+
+##############################################################################
+
+### Practical Exercise
+
+library(ggplot2)
+data("diamonds")
+
+?diamonds
+summary(diamonds)
+
+is.ordered(diamonds)
+as.ordered(diamonds)
+
+## histogram of price
+qplot(data = diamonds, x = price)
+
+summary(diamonds$price)
+
+less_than_500 <- (diamonds$price < 500)
+summary(less_than_500)
+
+less_than_250 <- (diamonds$price < 250)
+summary(less_than_250)
+
+more_than_15000 <- (diamonds$price >= 15000)
+summary(more_than_15000)
