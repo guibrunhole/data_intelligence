@@ -1,0 +1,79 @@
+
+##########################################################################
+####################### Select the best Percentile #######################
+##########################################################################
+
+
+- SelectPercentile: 10
+GaussianNB(priors=None)
+	Accuracy: 0.82182	Precision: 0.51818	Recall: 0.28500	F1: 0.36774	F2: 0.31319
+	Total predictions: 11000	True positives:  570	False positives:  530	False negatives: 1430	True negatives: 8470
+
+- SelectPercentile: 20
+GaussianNB(priors=None)
+	Accuracy: 0.82391	Precision: 0.52704	Recall: 0.30700	F1: 0.38799	F2: 0.33497
+	Total predictions: 11000	True positives:  614	False positives:  551	False negatives: 1386	True negatives: 8449
+
+- SelectPercentile: 25 => Best Option!!! :-)
+GaussianNB(priors=None)
+	Accuracy: 0.83255	Precision: 0.56280	Recall: 0.35400	F1: 0.43462	F2: 0.38237
+	Total predictions: 11000	True positives:  708	False positives:  550	False negatives: 1292	True negatives: 8450
+
+- SelectPercentile: 30
+GaussianNB(priors=None)
+	Accuracy: 0.82782	Precision: 0.53991	Recall: 0.35850	F1: 0.43089	F2: 0.38433
+	Total predictions: 11000	True positives:  717	False positives:  611	False negatives: 1283	True negatives: 8389
+
+- SelectPercentile: 40
+GaussianNB(priors=None)
+	Accuracy: 0.81817	Precision: 0.43627	Recall: 0.31150	F1: 0.36348	F2: 0.33040
+	Total predictions: 12000	True positives:  623	False positives:  805	False negatives: 1377	True negatives: 9195
+
+- SelectPercentile: 50
+GaussianNB(priors=None)
+	Accuracy: 0.75583	Precision: 0.27449	Recall: 0.28300	F1: 0.27868	F2: 0.28126
+	Total predictions: 12000	True positives:  566	False positives: 1496	False negatives: 1434	True negatives: 8504
+
+
+
+##########################################################################
+############################ Tuning the Model ############################
+##########################################################################
+
+### NaiveBayes
+GaussianNB(priors=None)
+	Accuracy: 0.83255	Precision: 0.56280	Recall: 0.35400	F1: 0.43462	F2: 0.38237
+	Total predictions: 11000	True positives:  708	False positives:  550	False negatives: 1292	True negatives: 8450
+
+### SDGClassifier
+SGDClassifier(alpha=0.0001, average=False, class_weight=None, epsilon=0.1,
+       eta0=0.0, fit_intercept=True, l1_ratio=0.15,
+       learning_rate='optimal', loss='hinge', n_iter=5, n_jobs=1,
+       penalty='l2', power_t=0.5, random_state=None, shuffle=True,
+       verbose=0, warm_start=False)
+	Accuracy: 0.57573	Precision: 0.16283	Recall: 0.32200	F1: 0.21629	F2: 0.26934
+	Total predictions: 11000	True positives:  644	False positives: 3311	False negatives: 1356	True negatives: 5689
+
+
+### DecisionTree
+DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+            max_features=None, max_leaf_nodes=None,
+            min_impurity_split=1e-07, min_samples_leaf=1,
+            min_samples_split=2, min_weight_fraction_leaf=0.0,
+            presort=False, random_state=None, splitter='best')
+	Accuracy: 0.76773	Precision: 0.35232	Recall: 0.33100	F1: 0.34133	F2: 0.33505
+	Total predictions: 11000	True positives:  662	False positives: 1217	False negatives: 1338	True negatives: 7783
+
+
+### RandomForest
+RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+            max_depth=None, max_features='auto', max_leaf_nodes=None,
+            min_impurity_split=1e-07, min_samples_leaf=1,
+            min_samples_split=2, min_weight_fraction_leaf=0.0,
+            n_estimators=10, n_jobs=1, oob_score=False, random_state=None,
+            verbose=0, warm_start=False)
+	Accuracy: 0.82473	Precision: 0.54358	Recall: 0.22450	F1: 0.31776	F2: 0.25436
+	Total predictions: 11000	True positives:  449	False positives:  377	False negatives: 1551	True negatives: 8623
+
+
+
