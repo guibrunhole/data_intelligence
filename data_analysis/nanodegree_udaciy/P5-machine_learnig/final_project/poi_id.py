@@ -57,7 +57,12 @@ new_data_dict = computeFractionPoi(data_dict)
 df_data = pd.DataFrame.from_dict(new_data_dict, orient='index')
 df = df_data[df_data.email_address != 'NaN']
 
-# df.head()
+total_size= len(df_data)
+total_poi = df_data[df_data.poi]
+print 'Total de registros: ', total_size
+print 'Total de poi: ',len(total_poi)
+print 'Total de nao-poi: ',total_size - len(total_poi)
+print 'Total de atributos:', len(df_data.columns)
 
 cols = df.columns.tolist()
 # len(cols) 23
@@ -142,7 +147,7 @@ acc_lm = clf.score(features, labels)
 ### stratified shuffle split cross validation. For more info: 
 ### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
 
-# using cross validation to split our data
+# splitting our data
 from sklearn.cross_validation import train_test_split
 features_train, features_test, labels_train, labels_test = \
     train_test_split(features, labels, test_size=0.3, random_state=42)
@@ -186,6 +191,7 @@ from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import recall_score
 from sklearn.grid_search import GridSearchCV
+from sklearn.cross_validation import StratifiedShuffleSplit
 
 ### DecisionTree
 # clf = DecisionTreeClassifier()
@@ -194,10 +200,20 @@ from sklearn.grid_search import GridSearchCV
 # clf = RandomForestClassifier() # toooooooooo slow
 
 # ### SDGClassifer 
-# clf = SGDClassifier(penalty='l2',random_state=42)
+### Utilizando GridSearchCV para tuning do modelo com SGDClassifier, porem ainda assim o modelo com NaiveBayes foi superior
+# sgd = SGDClassifier(penalty='l2',random_state=42)
+# parameters = {'loss': ['hinge','log','squared_hinge'],
+#               'n_iter': [1,5],
+#               'alpha': [1e-2, 1e-4 ,1e-6],
+#               }
+# clf = GridSearchCV(sgd,parameters,scoring='f1',cv=10)
+
+# using cross validation
+cv = StratifiedShuffleSplit(df.poi,10,random_state=42)
 
 # ### Naive Bayes
 clf = GaussianNB() # => best result, check it on my_review.txt
+
 #################################################
 #################################################
 ### Task 6: Dump your classifier, dataset, and features_list so anyone can
