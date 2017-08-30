@@ -65,18 +65,18 @@ pf <- read.delim('pseudo_facebook.tsv') ## is similar to read.csv('pseudo_facebo
 names(pf) ## view column name
 
 qplot(data = pf, x = dob_day, binwidth = 0.5) 
-      + (scale_x_continuous(breaks = 1:31)) 
-      + facet_wrap(~dob_month, ncol=3)
++ (scale_x_continuous(breaks = 1:31)) 
++ facet_wrap(~dob_month, ncol=3)
 
 
 qplot(data = pf, x = friend_count) 
 qplot(data = pf, x = friend_count, xlim = c(0,1000)) 
 
 qplot(data = pf, x = friend_count, binwidth = 25)
-      + (scale_x_continuous(limits = c(0,1000), breaks = seq(0,1000,50)))
-      + facet_wrap(~gender)
++ (scale_x_continuous(limits = c(0,1000), breaks = seq(0,1000,50)))
++ facet_wrap(~gender)
 
- 
+
 ## count by gender
 table(pf$gender) 
 
@@ -94,15 +94,15 @@ ggplot(aes(x = tenure), data = pf) +
 ##with qplot
 qplot(x = tenure/365, data = pf, binwidth = .25,
       color = I('black'), fill = I('#F79420')) +
-      scale_x_continuous(breaks = seq(1, 7, 1), limits = c(0, 7)) +
-      xlab('Number of years using Facebook') + 
-      ylab('Number of users in sample')
+  scale_x_continuous(breaks = seq(1, 7, 1), limits = c(0, 7)) +
+  xlab('Number of years using Facebook') + 
+  ylab('Number of users in sample')
 
 ## age histogram
 qplot(x = age, data = pf, binwidth = 1,
       color = I('black'), fill = I('#F23512')) +
-      xlab('Age of Facebook users') + 
-      ylab('Number of users in sample')
+  xlab('Age of Facebook users') + 
+  ylab('Number of users in sample')
 
 ## multiples plots in onde graph
 install.packages('gridExtra') 

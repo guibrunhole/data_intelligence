@@ -1,0 +1,551 @@
+---
+title: "Wine Quality"
+author: "Guilherme Brunhole"
+date: "July 20, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# P4 - Explore e resuma os dados
+
+## Bibliotecas utilizadas no projeto:
+```{r libraries}
+library('ggplot2')
+library(readr)
+library(grid)
+library(gridExtra)
+library(dplyr)
+```
+
+## Carregando os dados:
+```{r echo=FALSE, Load_the_Data}
+# Carregamento dos dados
+wineQualityReds <- read_csv("/guibrunhole/data_intelligence/data_analysis/nanodegree_udaciy/P4-exploring_with_r/Project/wineQualityReds.csv")
+```
+### Funções auxiliares:
+```{r echo=FALSE, Bivariate_rel}
+box_plot_func <- function(x_str = "quality.label", 
+                          y_str, xl = "Quality label",yl,t){
+  ggplot( data = wineQualityReds, aes_string(x=x_str, y = y_str)) +
+    geom_boxplot()+
+    xlab(xl)+
+    ylab(yl)+ 
+    ggtitle(t)
+}
+
+point_plot_func <- function( col = "quality.label",
+                            x_str, y_str, xl, yl, t, rvrs = T, 
+                            lt = "Quality" ){
+  ggplot( data = wineQualityReds, aes_string(x=x_str, y = y_str, color=col)) +
+    geom_point(size=3, alpha=0.5, position="jitter")+
+    xlab(xl)+
+    ylab(yl)+    
+    ggtitle(t)+
+    scale_color_brewer(palette="Spectral",
+                       guide = guide_legend(title = lt, 
+                                            reverse = rvrs))
+}
+
+#function to create density plot object 
+density_plot_func <- function(d = wineQualityReds,x_str,col,xl,t){
+  ggplot( data = d, aes_string(x = x_str, color=col ))+
+    geom_density(size = 1)+
+    xlab(xl)+    
+    ggtitle(t)  
+}
+```
+
+### Qual é a estrutura do conjunto de dados?
+```{r}
+names(wineQualityReds)
+```
+```{r echo=FALSE, structure}
+summary(wineQualityReds)
+```
+
+### Algumas observações sobre nosso conjunto de dados:
+- Nossos dados consistem em 13 variáveis com aprox. 1600 registros :)
+- *total.sulfur.dioxide* é o que apresenta maior variabilidade nos dados (6.0 - 289.0)
+- Provavelmente exista algum erro na coluna *density* (max = 1001.00)
+- Não existem vinhos extremamente ruins, o range está entre 3 e 8
+
+Removendo os valores NA's da coluna *total.sulfur.dioxide*:
+```{r}
+wineQualityReds <- na.omit(wineQualityReds)
+
+summary(wineQualityReds)
+```
+
+
+# Seção de Gráficos Univariados
+
+O primeiro gráfico que farei é  um histograma simples utilizando a qualidade do vinho como eixo X. Quero saber qual é o nível dos vinhos em nosso dataset!
+
+```{r echo=FALSE, Univariate_Plots}
+ggplot(wineQualityReds, aes(x = quality)) +
+   geom_histogram(binwidth = 0.75,
+                  col="black",
+                 aes(fill=..count..)) +
+  ylab('Frequency') + 
+  xlab('Wine Quality') +
+  labs(title='1- Quality Histogram')
+```
+
+Como podemos ver, a maioria dos vinhos em nosso dataset é de qualidade ou 5 ou 6, ou seja, são um pouco acima da média já que a escala é de 0 a 8.
+
+Vamos olhar rapidamente para as outras variáveis!
+
+```{r}
+plot_fix_acid = ggplot(wineQualityReds, aes(x = fixed.acidity))+
+                      geom_histogram(color="white", fill="#3366FF") +
+                      ylab('Frequency') + 
+                      xlab('Fixed Acidity') +
+                      labs(title='2- Fixed Acidity Histogram') +
+  coord_cartesian(xlim=c(quantile(wineQualityReds$fixed.acidity, 0.01),
+                         quantile(wineQualityReds$fixed.acidity, 0.99)))
+
+plot_vol_acid = ggplot(wineQualityReds, aes(x = volatile.acidity))+
+                    ylab('Frequency') + 
+                    xlab('Volatile Acidity') +
+                    labs(title='3- Volatile Acidity Histogram') +
+                    geom_histogram(color="white", fill="#3366FF",bins = 10000) +
+                     coord_cartesian(xlim=c(0,1))
+
+plot_cit_acid = ggplot(wineQualityReds, aes(x = citric.acid))+
+                    geom_histogram(color="white", fill="#3366FF") +
+                    ylab('Frequency') + 
+                    xlab('Citric Acid') +
+                    labs(title='4- Citric Acid Histogram') +
+                     coord_cartesian(xlim=c(0,0.75))
+
+plot_res_sugar = ggplot(wineQualityReds, aes(x = residual.sugar))+
+                    geom_histogram(color="white", fill="#3366FF") +
+                    ylab('Frequency') + 
+                    xlab('Residual Sugar') +
+                    labs(title='5- Residual Sugar Histogram') +
+                     scale_x_continuous(breaks = seq(1,5,0.5))+  
+                     coord_cartesian(xlim=c(1,5))
+
+plot_chlorides = ggplot(wineQualityReds, aes(x = chlorides))+
+                    geom_histogram(color="white", fill="#3366FF", bins = 100) +
+                    ylab('Frequency') + 
+                    xlab('Chlorides') +
+                    labs(title='6- Chlorides Histogram') +
+                     coord_cartesian(xlim=c(0,0.2))
+
+plot_so2 = ggplot(wineQualityReds, aes(x = total.sulfur.dioxide))+
+                      geom_histogram(color="white", fill="#3366FF") +
+                      ylab('Frequency') + 
+                      xlab('SO2') +
+                      labs(title='7- SO2 Histogram') +
+                      coord_cartesian(xlim=c(0,150))
+
+plot_ph = ggplot(wineQualityReds, aes(x = pH))+
+                      geom_histogram(color="white", fill="#3366FF") +
+                      ylab('Frequency') + 
+                      xlab('pH') +
+                      labs(title='8- pH Histogram') +
+                      scale_x_continuous(breaks = seq(0,4,0.2))+
+                      coord_cartesian(xlim=c(2.8,3.8))
+
+plot_alcohol = ggplot(wineQualityReds, aes(x = alcohol))+
+              geom_histogram(color="white", fill="#3366FF") +
+              ylab('Frequency') + 
+              xlab('Alcohol') +
+              labs(title='9- Alcohol Histogram')
+
+grid.arrange(plot_fix_acid,plot_vol_acid,plot_cit_acid,plot_res_sugar,ncol=2)
+```
+
+```{r}
+grid.arrange(plot_chlorides,plot_so2,plot_ph,plot_alcohol,ncol=2)
+```
+
+Como podemos ver, existe algum problema com os dados do gráfico de *chlorides*. 
+Vamos olhar essa variável separadamente :)
+
+### Transformações nos dados
+
+```{r}
+wineQualityReds$chlorides_new <- ifelse(wineQualityReds$chlorides > 1, 
+                                    wineQualityReds$chlorides/1000.0,
+                                    wineQualityReds$chlorides)
+```
+
+Vamos ver agora se deu tudo certo com essa coluna :)
+```{r}
+summary(wineQualityReds$chlorides_new)
+```
+
+```{r}
+ggplot(wineQualityReds, aes(x = chlorides_new)  )+
+                    geom_histogram(color="white", fill="#3366FF") +
+                     coord_cartesian(xlim=c(0,0.2))
+```
+
+### Algumas observações:
+
+- A maioria das variáveis possui uma distribuição normal em seu histograma :)
+
+
+### Quais são os principais atributos de interesse deste conjunto de dados?
+
+Para descobrirmos quais são os principais atributos aqui, vamos verificar quais tem que correlação com a coluna quality. Para isso existe a função *cor()* do r
+```{r echo=FALSE, attr}
+cor(wineQualityReds)[,'quality'] # três principais
+```
+
+Como podemos observar, os principais atributos desse conjunto de dados são o *alcohol*, *sulphates*, *volatile.acidity* e *citric.acid*
+
+### Você criou novas variáveis a partir dos atributos existentes no conjunto de dados?
+Sobre a coluna *quality*, irei criar uma label com três valores:
+- Ruim: (4,5]
+- Bom: (5,6]
+- Ótimo: (7,8]
+
+```{r}
+wineQualityReds$quality.label <- cut(wineQualityReds$quality, c(3,4,6,10), 
+                                     labels = c("ruim","bom","ótimo"),
+                                     include.lowest = T)
+summary(wineQualityReds$quality.label)
+```
+
+
+### Quais outros atributos você acha que podem lhe auxiliar na investigação destes atributos de interesse?
+
+Vamos olhar quais atributos são mais relevantes para cada uma das três variáveis mencionadas acima! :)
+
+### Ácido Cítrico
+```{r}
+cor(wineQualityReds[,-15])[,'citric.acid']
+```
+
+Aqui podemos ver que o que mais influencia é o atributo *fixed.acidity*.
+
+### Sulfito
+```{r}
+cor(wineQualityReds[,-15])[,'sulphates']
+```
+
+O que mais tem influência sob esse atributo é o *chlorides*
+
+### Álcool
+```{r}
+cor(wineQualityReds[,-15])[,'alcohol']
+```
+
+Aqui o *ph* é o que mais tem influência nesse atributo!
+
+Relembrando:
+- *fixed.acidity*
+- *chlorides*
+- *ph*
+- *sulphates*
+
+Agora que listamos as outras quatro variáveis que serão usadas, mais à frente iremos analisá-las também!
+
+# Análise Bivariada
+
+Vou fazer algumas análises abaixo para verificarmos a relação entre duas variáveis :)
+
+Primeiro irei utilizar da biblioteca *lsr*, a função *correlate* que me dá a relação entre duas variávies! 
+```{r echo=FALSE, Bivariate_Analysis}
+library(lsr)
+correlate(as.data.frame(wineQualityReds))
+```
+
+Legal né? 
+Mas é uma tabela, então é dificil tirar uma conclusão rápida!
+
+Abaixo vou fazer um plot disso e você vai poder perceber o quão mais fácil fica :)
+
+```{r}
+library(ellipse)
+#craete new dataframe without categorical vars 
+numeric_vars <- names(wineQualityReds) %in% c("quality.label", "quality")
+rw_num <- wineQualityReds[!numeric_vars]
+ctab <- cor(rw_num)
+#plot which show correlation in more convenient way
+colorfun <- colorRamp(c("#CC0000","white","#3366CC"), space="Lab")
+plotcorr(ctab, mar = c(0,0,0,0), col=rgb(colorfun((ctab+1)/2), 
+                                         maxColorValue=255))
+```
+### Discuta sobre alguns dos relacionamentos observados nesta parte da investigação. Como os atributos de interesse variaram no conjunto de dados?
+
+Apenas uma explicação rápida, quanto mais azul e mais inclinado para a direita, mais positivamente correlacionada as variáveis são. E quanto mais vermelho e mais inclinado para a esquerda, mais negativamente correlacionadas elas são! 
+
+Só de bater o olho já conseguimos ver 4 fortes correlações (2 positivas e 2 negativas) :)
+
+Abaixo um resumo por variável:
+
+- *fixed.acidity*: correlação positiva com citric.acid, density negativa com pH
+- *volatile.acidity*: correlação negativa com citric.acid
+- *citric.acid*: correlação positiva com density e correlação negativa com fixed.acidity, - volatile.acidity, pH
+- *chlorides*: correlação positiva com sulphates
+- *pH*: correlação negativa com fixed.acidity, citric.acid, chlorides, density
+- *alcohol*: correlação negativa com density
+- *density*: correlação positiva com fixed.acidity, citric.acid, residual.sugar e correlação negativa com alcohol
+
+
+
+Vamos aqui olhar variável à variável em relação à nossa de qualidade :)
+
+#### Citric Acid
+```{r}
+box_plot_func(y_str = "citric.acid", 
+              yl = "Citric acid",
+              t = "Ácido Cítrico pela Qualidade")
+```
+
+```{r}
+by(wineQualityReds$citric.acid, wineQualityReds$quality.label,  summary)
+```
+
+Muito bom esse plot! Podemos ver que existem pouqíssimos outliers :D
+Além disso, pode-se perceber que realmente essa coluna tem uma influência na qualidade do vinho
+
+#### SO2 
+```{r}
+box_plot_func(y_str = "total.sulfur.dioxide", 
+              yl = "Total SO2",
+              t = "SO2 pela Qualidade")
+```
+
+```{r}
+by(wineQualityReds$total.sulfur.dioxide, wineQualityReds$quality.label,  summary)
+```
+
+Aqui podemos já perceber que existem diversos outliers. Além disso não há muito o que comentar, já que possue um comportamento um tanto quanto similar entre os tipos de vinho.
+
+#### Residual Sugar 
+```{r}
+box_plot_func(y_str = "residual.sugar", 
+              yl = "Residual Sugar",
+              t = "Açúcar pela Qualidade")
+```
+
+```{r}
+by(wineQualityReds$residual.sugar, wineQualityReds$quality.label,  summary)
+```
+
+Existem muitos outliers, principalmente em vinhos *bons*, mas no geral essa coluna tem um comportamento similar entre os diversos tipos.
+
+#### pH
+```{r}
+box_plot_func(y_str = "pH", 
+              yl = "pH",
+              t = "pH pela Qualidade")
+```
+
+```{r}
+by(wineQualityReds$pH, wineQualityReds$quality.label,  summary)
+```
+
+Existem alguns outliers, principalmente em vinhos *bons*, mas no geral essa coluna tem um comportamento similar entre os diversos tipos.
+
+#### SO2 
+```{r}
+box_plot_func(y_str = "total.sulfur.dioxide", 
+              yl = "Total SO2",
+              t = "SO2 pela Qualidade")
+```
+
+```{r}
+by(wineQualityReds$total.sulfur.dioxide, wineQualityReds$quality.label,  summary)
+```
+
+Por incrível que pareça, vinhos classificados como *ótimos* e *ruins* possuem um comportamento similar para essa variável. Além disso existem alguns outliers, principalmentes nos vinhos classificados como *ótimos*.
+
+
+#### Alcohol 
+```{r}
+box_plot_func(y_str = "alcohol", 
+              yl = "Álcool",
+              t = "Álcool pela Qualidade")
+```
+
+```{r}
+by(wineQualityReds$alcohol, wineQualityReds$quality.label,  summary)
+```
+
+Aqui conseguimos ver que os vinhos classificados como *ótimos* possuem uma quantidade maior de álcool em sua composição. Vinhos *bons* e *ruins* são praticamente idênticos.
+
+#### Sulphates 
+```{r}
+box_plot_func(y_str = "sulphates", 
+              yl = "Sulphates",
+              t = "Sulphates by Quality")
+```
+
+```{r}
+by(wineQualityReds$sulphates, wineQualityReds$quality.label,  summary)
+```
+
+Muito legal essa variável, podemos ver que ela possui um comportamento diferente para as três classificações de qualidade :)
+
+#### Chlorides 
+```{r}
+box_plot_func(y_str = "chlorides", 
+              yl = "Chlorides",
+              t = "Chlorides by Quality")
+```
+
+```{r}
+by(wineQualityReds$chlorides, wineQualityReds$quality.label,  summary)
+```
+
+Possui um comportamento um tanto quanto similar entre as qualidades *boa* e *ruim*, mas já para a *ótima* ela tem um comportamento diferente :)
+
+### Você observou algum relacionamento interessante entre os outros atributos (os que não são de interesse)?
+
+Aprentemente a qualidade do vinho depende das seguintes características:
+- Álcool
+- Sulfatos
+- Volatilidade do ácido
+- Ácido cítrico
+
+# Seção de Gráficos Multivariados
+
+### Chlorides vs pH by Quality
+```{r echo=FALSE, Multivariate_Plots_0}
+point_plot_func( x_str = "pH", 
+                 y_str = "chlorides", 
+                 xl = "pH", 
+                 yl = "Chorides", 
+                 t = "Chlorides vs pH by Quality", 
+                 rvrs = F)+
+  coord_cartesian(ylim=c(0,0.2))
+```
+
+Não consegui tirar nenhuma conclusão a partir desse gráfico.
+
+
+### Sulphates vs pH by Quality
+```{r echo=FALSE, Multivariate_Plots}
+point_plot_func( x_str = "pH", 
+                 y_str = "sulphates", 
+                 xl = "pH", 
+                 yl = "Sulphates", 
+                 t = "Sulphates vs pH by Quality rank")
+```
+
+Para que vinhos com uma quantidade maior de sulfato tendem a ter uma qualidade melhor.
+Mais uma prova de que essa variável é importante :)
+
+### Citric acid vs pH by Quality rank
+```{r echo=FALSE, Multivariate_Plots_1}
+point_plot_func( x_str = "pH", 
+                 y_str = "citric.acid", 
+                 xl = "pH", 
+                 yl = "Citric acid", 
+                 t = "Citric acid vs pH by Quality rank")
+```
+
+Aparentemente, vinhos com um pH menor do que 3.5 e com mais de 0.25 de ácido cítrico tendem a ter uma qualidade superior aos outros :)
+
+### Vamos olhar para a coluna *sulphates* mais de perto
+```{r echo=FALSE, Multivariate_Plots_2}
+point_plot_func( x_str = "total.sulfur.dioxide", 
+                 y_str = "sulphates", 
+                 xl = "Total SO2", 
+                 yl = "Sulphates", 
+                 t = "Sulphates vs Total SO2 by Quality rank")+
+    coord_cartesian(ylim=c(0,1.5), xlim=c(0,100))
+```
+
+Parece que vinhos bons tem menos de 50g de SO2 em sua composição! Mais uma evidencia :)
+
+```{r echo=FALSE, Multivariate_Plots_3}
+point_plot_func( x_str = "alcohol", 
+                 y_str = "sulphates", 
+                 xl = "Alcohol", 
+                 yl = "Sulphates", 
+                 t = "Sulphates vs Alcohol by Quality rank")
+```
+
+Aqui com esse gráfico fica bem claro que vinhos bons, em geral, possuem uma gradação alcóolica maior do que 10% e *sulphates* maior do que 0.6
+
+# Gráficos finais e sumário
+  
+### Primeiro Gráfico
+
+```{r}
+density_plot_func(col = "quality.label",
+                  x_str = "alcohol",
+                  xl = "Alcohol",
+                  t = "Alcohol density\n by quality rank")+
+  theme(legend.justification=c(1,1), 
+        legend.position=c(1,1))  
+```
+
+
+### Descrição do primeiro gráfico
+Nitidamente vemos que vinhos *bons* possuem um percentual alcóolico maior em relação aos outros :)
+
+
+### Segundo Gráfico
+```{r}
+final_plot_two_1 = ggplot( data = wineQualityReds, 
+                           aes(x=quality.label, 
+                               y = sulphates, 
+                               fill = quality.label)) +
+  geom_boxplot()+
+  xlab("Quality rank")+
+  ylab("Sulphates (g / dm^3)")+
+  ggtitle("Sulphates by quality rank")+
+  coord_cartesian(ylim=c(0.4,0.9))+
+  theme(legend.justification=c(1,0), 
+        legend.position=c(1,0))
+
+final_plot_two_2 = point_plot_func( x_str = "pH", 
+                 y_str = "sulphates", 
+                 yl = "Sulphates", 
+                 xl = "pH", 
+                 t = "Sulphates vs pH by quality rank")+
+  coord_cartesian(ylim=c(0.2,1.2))+ 
+  theme(legend.justification=c(1,0), 
+        legend.position=c(1,0))
+
+grid.arrange(final_plot_two_1, final_plot_two_2, ncol=2)
+```
+
+
+### Descrição do Segundo Gráfico
+O comportamento da variável *sulphates* tem um comportamento bem diferente em relação aos três tipos, isso é muito bom :)
+
+No segundo gráfico vemos que em geral, vinhos bons possuem o nível de *sulphates* maior do que 0.6
+
+### Terceiro Gráfico
+```{r}
+wineQuality = subset(wineQualityReds, quality.label == "ótimo")
+wineQuality$is.outliers <- ifelse(wineQuality$citric.acid<0.25 & wineQuality$volatile.acidity>0.4,
+                        "y", "n")
+
+density_plot_func(d = wineQuality,
+                  col = "is.outliers",
+                  x_str = "pH",
+                  xl = "pH",
+                  t = "Density of pH for wineQuality rank wines")+
+  theme(plot.title = element_text(size=12), 
+        legend.justification=c(1,1), 
+        legend.position=c(1,1))
+```
+
+### Descrição do Terceiro Gráfico
+
+Nesse gráfico podemos ver claramente que vinhos que foram classificados como *outliers* para as variáveis *citric.acid* e *volatile.acidity* em geral possuem um pH superior aos outros.
+
+
+------
+  
+# Reflexão
+
+Quando vi que teria a oportunidade de estudar esse dataset eu fiquei muito animado! 
+Não sou um grande entendedor de vinhos, mas sou de família italiana, ou seja, ao invés de sangue é vinho que corre em minhas veias :P
+
+Confesso que ao iniciar esse projeto eu não fazia ideia do que mais tem influência na qualidade. Aí para ver isso já de maneira bem rápida, eu usei a função *cor()*, que me mostrou que as variáveis que mais influenciam são *SO2*, *sulphates*, *pH*, *acidity* e *alcohol*.
+
+Para comprovar isso, fiz todos os gráficos. E analisando-os, realmente vi que os vinhos de qualidade boa se concentram em determinadas regiões dos gráficos para cada variável.
