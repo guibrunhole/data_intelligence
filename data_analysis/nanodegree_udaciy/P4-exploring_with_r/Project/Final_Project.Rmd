@@ -28,42 +28,45 @@ wineQualityReds <- read_csv("/guibrunhole/data_intelligence/data_analysis/nanode
 ### Funções auxiliares:
 
 Essas funções foram criadas para facilitar o entendimento do código e também diminuir seu tamanho na hora da criação dos gráficos.
-A primeira função, *box_plot_func* é para a criação de um boxplot separado pela coluna *quality.label*, a segunda função, *pont_plot_func* é para a criação de um gráfico de dispersão agrupado pela coluna *quality.label* e a terceira função *density_plot_func* é para a criação de um gráfico de densidade.
 ```{r echo=FALSE, Bivariate_rel}
+#*box_plot_func* é para a criação de um boxplot separado pela coluna *quality.label*
 box_plot_func <- function(x_str = "quality.label", y_str, xl = "Quality",yl,t){
-                              ggplot( data = wineQualityReds, aes_string(x=x_str, y = y_str)) +
-                                      geom_boxplot()+
-                                      xlab(xl)+
-                                      ylab(yl)+ 
+                              ggplot(data = wineQualityReds, aes_string(x = x_str, y = y_str)) +
+                                      geom_boxplot() +
+                                      xlab(xl) +
+                                      ylab(yl) + 
                                       ggtitle(t)
                           }
 
+#*pont_plot_func* é para a criação de um gráfico de dispersão agrupado pela coluna *quality.label*
 point_plot_func <- function( col = "quality.label",x_str, y_str, xl, yl, t, rvrs = T, lt = "Quality" ){
-                              ggplot( data = wineQualityReds, aes_string(x=x_str, y = y_str, color=col)) +
-                                      geom_point(size=3, alpha=0.5, position="jitter")+
-                                      xlab(xl)+
-                                      ylab(yl)+    
-                                      ggtitle(t)+
+                              ggplot( data = wineQualityReds, aes_string(x = x_str, y = y_str, color = col)) +
+                                      geom_point(size = 3, alpha = 0.5, position = "jitter") +
+                                      xlab(xl) +
+                                      ylab(yl) +    
+                                      ggtitle(t) +
                                       scale_color_brewer(palette="Spectral",
                                                          guide = guide_legend(title = lt, reverse = rvrs))
                             }
 
-#function to create density plot object 
-density_plot_func <- function(d = wineQualityReds,x_str,col,xl,t, lt){
-                                ggplot( data = d, aes_string(x = x_str, color=col ))+
-                                        geom_density(size = 1)+
-                                        xlab(xl)+    
-                                        ggtitle(t)+
-                                      scale_color_brewer(palette="Set1",
+#*density_plot_func* é para a criação de um gráfico de densidade.
+density_plot_func <- function(d = wineQualityReds, x_str, col, xl, t, lt){
+                                ggplot( data = d, aes_string(x = x_str, color = col )) +
+                                        geom_density(size = 1) +
+                                        xlab(xl) +    
+                                        ggtitle(t) +
+                                        scale_color_brewer(palette="Set1",
                                                          guide = guide_legend(title = lt, reverse = T))
                               }
 ```
 
 ### Qual é a estrutura do conjunto de dados?
 ```{r}
+#funcao que retorna o nome das colunas
 names(wineQualityReds)
 ```
 ```{r echo=FALSE, structure}
+#funcao que retorna dados estatisticos das colunas
 summary(wineQualityReds)
 ```
 
@@ -75,6 +78,7 @@ summary(wineQualityReds)
 
 Removendo os valores NA's da coluna *total.sulfur.dioxide*:
 ```{r}
+#removendo os valores NA 
 wineQualityReds <- na.omit(wineQualityReds)
 
 summary(wineQualityReds)
@@ -87,10 +91,10 @@ O primeiro gráfico que farei é  um histograma simples utilizando a qualidade d
 
 ```{r echo=FALSE, Univariate_Plots}
 ggplot( data = wineQualityReds, aes(x = quality)) +
-    geom_bar(color="white", fill="#3366FF")+
-    ggtitle('Quality distribution')+
-    xlab('Quality')+
-    theme(plot.title = element_text(size=12))
+    geom_bar(color = "white", fill = "#3366FF") +
+    ggtitle('Quality distribution') +
+    xlab('Quality') +
+    theme(plot.title = element_text(size = 12))
 ```
 
 Como podemos ver, a maioria dos vinhos em nosso dataset é de qualidade ou 5 ou 6, ou seja, são um pouco acima da média já que a escala é de 0 a 8.
@@ -98,8 +102,9 @@ Como podemos ver, a maioria dos vinhos em nosso dataset é de qualidade ou 5 ou 
 Vamos olhar rapidamente para as outras variáveis!
 
 ```{r}
-plot_fix_acid <- ggplot(wineQualityReds, aes(x = fixed.acidity))+
-                      geom_histogram(color="white", fill="#3366FF") +
+#nesse trecho de codigo crio 8 graficos, uum por variavel e depois exibo-os em agrupamentos de 4 graficos cada
+plot_fix_acid <- ggplot(wineQualityReds, aes(x = fixed.acidity)) +
+                      geom_histogram(color = "white", fill = "#3366FF") +
                       ylab('Frequency') + 
                       xlab('Fixed Acidity (g / dm^3)') +
                       labs(title='2- Fixed Acidity Histogram')
@@ -108,71 +113,51 @@ plot_vol_acid <- ggplot(wineQualityReds, aes(x = volatile.acidity))+
                     ylab('Frequency') + 
                     xlab('Volatile Acidity (g / dm^3)') +
                     labs(title='3- Volatile Acidity Histogram') +
-                    geom_histogram(fill="#3366FF",bins = 100) +
-                    scale_x_log10()
+                    geom_histogram(fill = "#3366FF",bins = 100)
 
 plot_cit_acid <- ggplot(wineQualityReds, aes(x = citric.acid))+
-                    geom_histogram(color="white", fill="#3366FF") +
+                    geom_histogram(color = "white", fill = "#3366FF") +
                     ylab('Frequency') + 
                     xlab('Citric Acid (g / dm^3)') +
                     labs(title='4- Citric Acid Histogram')
 
 plot_res_sugar <- ggplot(wineQualityReds, aes(x = residual.sugar))+
-                    geom_histogram(color="white", fill="#3366FF") +
+                    geom_histogram(color = "white", fill = "#3366FF") +
                     ylab('Frequency') + 
                     xlab('Residual Sugar (g / dm^3)') +
                     labs(title='5- Residual Sugar Histogram')
 
 plot_chlorides <- ggplot(wineQualityReds, aes(x = chlorides))+
-                    geom_histogram(color="white", fill="#3366FF", bins = 100) +
+                    geom_histogram(color = "white", fill = "#3366FF", bins = 50) +
                     ylab('Frequency') + 
                     xlab('Chlorides (g / dm^3)') +
                     labs(title='6- Chlorides Histogram')
 
 plot_so2 <- ggplot(wineQualityReds, aes(x = total.sulfur.dioxide))+
-                      geom_histogram(color="white", fill="#3366FF") +
+                      geom_histogram(color = "white", fill = "#3366FF") +
                       ylab('Frequency') + 
                       xlab('SO2 (g / dm^3)') +
                       labs(title='7- SO2 Histogram')
 
 plot_ph <- ggplot(wineQualityReds, aes(x = pH))+
-                      geom_histogram(color="white", fill="#3366FF") +
+                      geom_histogram(color = "white", fill = "#3366FF") +
                       ylab('Frequency') + 
                       xlab('pH') +
                       labs(title='8- pH Histogram') +
                       scale_x_continuous(breaks = seq(0,4,0.2))
 
 plot_alcohol <- ggplot(wineQualityReds, aes(x = alcohol))+
-                          geom_histogram(color="white", fill="#3366FF") +
+                          geom_histogram(color = "white", fill = "#3366FF") +
                           ylab('Frequency') + 
                           xlab('Alcohol (% by volume)') +
                           labs(title='9- Alcohol Histogram')
 
-grid.arrange(plot_fix_acid,plot_vol_acid,plot_cit_acid,plot_res_sugar,ncol=2)
+grid.arrange(plot_fix_acid, plot_vol_acid, plot_cit_acid, plot_res_sugar, ncol = 2)
 ```
 
 ```{r}
-grid.arrange(plot_chlorides,plot_so2,plot_ph,plot_alcohol,ncol=2)
+grid.arrange(plot_chlorides, plot_so2, plot_ph, plot_alcohol, ncol = 2)
 ```
-
-### Algumas modificações:
-
-Vamos fazer uma pequena alteração na variável *volatile.acidity* para corrigirmos o eixo do gráfico.
-
-```{r}
-
-wineQualityReds$volatile.acidity <- ifelse(wineQualityReds$volatile.acidity > 100, 
-                                           wineQualityReds$volatile.acidity/1000, 
-                                           wineQualityReds$volatile.acidity)
-
-ggplot(wineQualityReds, aes(x = volatile.acidity))+
-                    ylab('Frequency') + 
-                    xlab('Volatile Acidity (g / dm^3)') +
-                    labs(title='3- Volatile Acidity Histogram') +
-                    geom_histogram(fill="#3366FF",bins = 100)
-```
-
-Pronto, agora o gráfico está com uma distribuição correta :)
 
 ### Algumas observações:
 
@@ -189,7 +174,8 @@ Pronto, agora o gráfico está com uma distribuição correta :)
 
 ### Quais são os principais atributos de interesse deste conjunto de dados?
 
-Para descobrirmos quais são os principais atributos aqui, vamos verificar quais tem que correlação com a coluna quality. Para isso existe a função *cor()* do r
+Para descobrirmos quais são os principais atributos aqui, vamos verificar quais tem que correlação com a coluna quality. Para isso existe a função *cor()* do r.
+Quão mais próximo o valor for de 1, mais positivamente é a correlação, ou seja, quão maior o valor da variável, maior será o da target. E assim é para quão mais próximo de -1, no caso seria inversamente proporcional.
 ```{r echo=FALSE, attr}
 cor(wineQualityReds)[,'quality'] # três principais
 ```
@@ -203,8 +189,9 @@ Sobre a coluna *quality*, irei criar uma label com três valores:
 - Ótimo: (7,8]
 
 ```{r}
-wineQualityReds$quality.label <- cut(wineQualityReds$quality, c(3,4,6,10), 
-                                     labels = c("ruim","bom","ótimo"),
+#criando uma coluna nova
+wineQualityReds$quality.label <- cut(wineQualityReds$quality, c(3, 4, 6, 10), 
+                                     labels = c("ruim", "bom", "ótimo"),
                                      include.lowest = T)
 summary(wineQualityReds$quality.label)
 ```
@@ -216,17 +203,18 @@ Vamos olhar quais atributos são mais relevantes para cada uma das três variáv
 
 ### Ácido Cítrico
 ```{r}
+# a funcao cor() retorna a correlacao entre as variaveis com a sua target, que eh passada como parametro
 cor(wineQualityReds[,-14])[,'citric.acid']
 ```
 
-Aqui podemos ver que o que mais influencia é o atributo *fixed.acidity*.
+Aqui podemos ver que o que mais influencia é o atributo *fixed.acidity*, podemos perceber também o o *pH* tem grande influência nessa variável, porém de maneira negativa.
 
 ### Sulfito
 ```{r}
 cor(wineQualityReds[,-14])[,'sulphates']
 ```
 
-O que mais tem influência sob esse atributo é o *chlorides*
+O que mais tem influência sob esse atributo é o *citric.acid*
 
 ### Álcool
 ```{r}
@@ -265,9 +253,9 @@ numeric_vars <- names(wineQualityReds) %in% c("quality.label", "rn")
 rw_num <- wineQualityReds[!numeric_vars]
 ctab <- cor(rw_num)
 #plot which show correlation in more convenient way
-colorfun <- colorRamp(c("#CC0000","white","#3366CC"), space="Lab")
-plotcorr(ctab, mar = c(0,0,0,0), col=rgb(colorfun((ctab+1)/2), 
-                                         maxColorValue=255))
+colorfun <- colorRamp(c("#CC0000", "white", "#3366CC"), space = "Lab")
+plotcorr(ctab, mar = c(0, 0, 0, 0), col = rgb(colorfun((ctab + 1) / 2), 
+                                                  maxColorValue = 255))
 ```
 
 ### Discuta sobre alguns dos relacionamentos observados nesta parte da investigação. Como os atributos de interesse variaram no conjunto de dados?
@@ -437,12 +425,12 @@ Irei refazê-la, porém excluindo os vinhos bons... vamos ver como que fica!
 
 ```{r echo=FALSE, Multivariate_Plots_v2}
 plotData = subset(wineQualityReds, quality.label != 'bom')
-ggplot( data = plotData, aes_string(x=plotData$pH, y = plotData$sulphates, color=plotData$quality.label)) +
-                geom_point(size=3, alpha=0.5, position="jitter")+
+ggplot( data = plotData, aes_string(x = plotData$pH, y = plotData$sulphates, color = plotData$quality.label)) +
+                geom_point(size = 3, alpha = 0.5, position = "jitter")+
                 xlab('pH')+
                 ylab('Sulphates (g / dm^3)')+    
                 ggtitle('Sulphates vs pH by Quality rank') +
-                scale_color_brewer(palette="Set1",guide = guide_legend(title = 'Quality', reverse = T))
+                scale_color_brewer(palette="Set1", guide = guide_legend(title = 'Quality', reverse = T))
 ```
 
 Agora já fica muito mais claro uma conclusão :)
@@ -466,7 +454,7 @@ point_plot_func( x_str = "total.sulfur.dioxide",
                  xl = "Total SO2 (g / dm^3)", 
                  yl = "Sulphates (g / dm^3)", 
                  t = "Sulphates vs Total SO2 by Quality rank")+
-    coord_cartesian(ylim=c(0,1.5), xlim=c(0,100))
+    coord_cartesian(ylim=c(0, 1.5), xlim=c(0, 100))
 ```
 
 Parece que vinhos bons tem menos de 50g de SO2 em sua composição! Mais uma evidencia :)
@@ -491,8 +479,8 @@ density_plot_func(col = "quality.label",
                   xl = "Alcohol (% of volume)",
                   t = "Alcohol density\n by quality rank",
                   lt = "Quality")+
-                  theme(legend.justification=c(1,1), 
-                  legend.position=c(1,1))
+                  theme(legend.justification = c(1, 1), 
+                  legend.position = c(1, 1))
 ```
 
 
@@ -504,38 +492,35 @@ Nitidamente vemos que vinhos *bons* possuem um percentual alcóolico maior em re
 Além do gráfico, podemos ver na tabela abaixo que realmente existe uma diferença entre cada tipo de vinho :)
 
 A distribuição dos vinhos ótimos e bons é unimodal, enquanto que a de vinhos ruins é bimodal.
-A maior concentração do teor alcóolico em vinhos ótimos está em pouco menos de 10%, enquanto que vinhos bons está perto de 12%.
+A maior concentração do teor alcóolico em vinhos bons está em pouco menos de 10%, enquanto que vinhos ótimos está perto de 12%.
 
-```{r}
-by(wineQualityReds$alcohol, wineQualityReds$quality.label,  summary)
-```
 
 
 
 ### Segundo Gráfico
 ```{r}
 final_plot_two_1 = ggplot(data = wineQualityReds, 
-                          aes(x=quality.label, 
+                          aes(x = quality.label, 
                           y = sulphates, 
                           fill = quality.label)) +
-                          geom_boxplot()+
-                          xlab("Quality rank")+
-                          ylab("Sulphates (g / dm^3)")+
-                          ggtitle("Sulphates by quality rank")+
-                          coord_cartesian(ylim=c(0.4,0.9))+
-                          theme(legend.justification=c(1,0), 
-                                legend.position=c(1,0))
+                          geom_boxplot() +
+                          xlab("Quality rank") +
+                          ylab("Sulphates (g / dm^3)") +
+                          ggtitle("Sulphates by quality rank") +
+                          coord_cartesian(ylim = c(0.4, 0.9)) +
+                          theme(legend.justification = c(1, 0), 
+                                legend.position = c(1, 0))
 
 final_plot_two_2 = point_plot_func(x_str = "citric.acid", 
                                    y_str = "sulphates", 
                                    yl = "Sulphates (g / dm^3)", 
                                    xl = "Citric Acid (g / dm^3)", 
-                                   t = "Sulphates vs Citric Acid by Quality")+
-                                  coord_cartesian(ylim=c(0.2,1.2))+ 
-                                  theme(legend.justification=c(1,0), 
-                                      legend.position=c(1,0))
+                                   t = "Sulphates vs Citric Acid by Quality") +
+                                  coord_cartesian(ylim = c(0.2, 1.2)) + 
+                                  theme(legend.justification = c(1, 0), 
+                                        legend.position = c(1, 0))
 
-grid.arrange(final_plot_two_1, final_plot_two_2, ncol=2)
+grid.arrange(final_plot_two_1, final_plot_two_2, ncol = 2)
 ```
 
 ### Descrição do Segundo Gráfico
@@ -546,35 +531,42 @@ No segundo gráfico vemos que em geral, vinhos bons possuem o nível de *sulphat
 Outra observação é em relação ao segundo gráfico, que mostra a relação entre o nível de *sulphates* e *citric.acid*. 
 Podemos perceber que vinhos classicados como ótimo em geral possuem um maior nível de *citric.acid* e também de *sulphates*. 
 
-```{r}
-by(wineQualityReds$sulphates, wineQualityReds$quality.label,  summary)
-```
+Um ponto de observação é em relação ao gráfico *Sulphates vc Citric Acid by Quality*. Ele está um tanto quanto poluído. Irei fazê-lo novamente, porém agora somente com vinhos *ótimos* e *ruins*:
 
 ```{r}
-by(wineQualityReds$citric.acid, wineQualityReds$quality.label,  summary)
+plotData = subset(wineQualityReds, quality.label != 'bom')
+ggplot( data = plotData, aes_string(x = plotData$citric.acid, 
+                                    y = plotData$sulphates, 
+                                    color = plotData$quality.label)) +
+                geom_point(size = 3, alpha = 0.5, position = "jitter")+
+                xlab('Citric Acid (g / dm^3)')+
+                ylab('Sulphates (g / dm^3)')+    
+                ggtitle('Sulphates vc Citric Acid by Quality') +
+                scale_color_brewer(palette="Set1", guide = guide_legend(title = 'Quality', reverse = T))
 ```
 
+Agora sim conseguimos ver de maneira clara como essas duas variáveis estão relacionadas e interferem na qualidade do vinho! :)
+Basicamente quando o nível de *sulphates* é menor do que 0.6, o vinho, em geral, não é de qualidade boa! (como mencionei acima)
 
 ### Terceiro Gráfico
 ```{r}
 ggplot()+
   geom_point(alpha = 0.5, 
              data = wineQualityReds, 
-             aes(x=volatile.acidity,
+             aes(x = volatile.acidity,
                  y = citric.acid, 
                  color = quality.label), 
-             size=2)+
-  scale_x_continuous(breaks = seq(0,1.6,0.2))+    
-  ylab("Citric acid  (g / dm^3)")+
-  xlab("Volatle acidity  (g / dm^3)")+    
-  ggtitle("Citric acid vs Volatile acidity by quality rank")+
-  scale_color_brewer(palette="Spectral",
+                size = 2) +
+  scale_x_continuous(breaks = seq(0, 1.6, 0.2)) +    
+  ylab("Citric acid  (g / dm^3)") +
+  xlab("Volatle acidity  (g / dm^3)") +    
+  ggtitle("Citric acid vs Volatile acidity by quality rank") +
+  scale_color_brewer(palette = "Spectral",
                      type = 'div',
-                     guide = guide_legend(title = 'Quality',
-                                          reverse = T))+  
-  theme(plot.title = element_text(size=12),
-        legend.justification=c(1,1), 
-        legend.position=c(1,1))
+                     guide = guide_legend(title = 'Quality', reverse = T)) +  
+  theme(plot.title = element_text(size = 12),
+        legend.justification = c(1, 1), 
+        legend.position = c(1, 1))
 ```
 
 ### Descrição do Terceiro Gráfico
@@ -583,14 +575,6 @@ A ideia de fazer esse gráfico foi verificar a relação entre as variáveis *ci
 Podemos ver claramente que quão menor o nível de *volatile.acidity* e maior o de *citric.acid*, melhor será a qualidade do vinho.
 Vinhos classificados como ruins tem um alto valor de *volatile.acidity* e um baixíssimo de *citric.acid* :)
 
-```{r}
-by(wineQualityReds$citric.acid, wineQualityReds$quality.label,  summary)
-```
-
-
-```{r}
-by(wineQualityReds$volatile.acidity, wineQualityReds$quality.label,  summary)
-```
 ------
   
 # Reflexão
@@ -599,6 +583,10 @@ Quando vi que teria a oportunidade de estudar esse dataset eu fiquei muito anima
 Não sou um grande entendedor de vinhos, mas sou de família italiana, ou seja, ao invés de sangue é vinho que corre em minhas veias :P
 
 Confesso que ao iniciar esse projeto eu não fazia ideia do que mais tem influência na qualidade. Aí para ver isso já de maneira bem rápida, eu usei a função *cor()*, que me mostrou que as variáveis que mais influenciam são *SO2*, *sulphates*, *pH*, *acidity* e *alcohol*.
+
+- A variável que mais tem influência é a *alcohol*. Como vimos no gráfico de densidade na última seção de gráficos, vinhos ótimos tendem a ter um nível mais elevado de álcool em sua composição.
+- *Suphates* em geral nos vinhos ótimos apresenta uma concentração maior do que 0.6. O legal é que há uma separação bem clara entre vinhos bons e ruins através dessa variável!
+- Em relação ao *pH*, vinhos bons e ótimos possuem uma distribuição um tanto quanto parecidas, sendo, em geral, mais ácidos do que os vinhos ruins.
 
 Para comprovar isso, fiz todos os gráficos. E analisando-os, realmente vi que os vinhos de qualidade boa se concentram em determinadas regiões dos gráficos para cada variável.
 
