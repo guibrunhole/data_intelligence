@@ -87,7 +87,7 @@ summary(wineQualityReds)
 
 # Seção de Gráficos Univariados
 
-O primeiro gráfico que farei é  um histograma simples utilizando a qualidade do vinho como eixo X. Quero saber qual é o nível dos vinhos em nosso dataset!
+O primeiro gráfico que farei é  um gráfico de barras simples utilizando a qualidade do vinho como eixo X. Quero saber qual é o nível dos vinhos em nosso dataset!
 
 ```{r echo=FALSE, Univariate_Plots}
 ggplot( data = wineQualityReds, aes(x = quality)) +
@@ -158,6 +158,26 @@ grid.arrange(plot_fix_acid, plot_vol_acid, plot_cit_acid, plot_res_sugar, ncol =
 ```{r}
 grid.arrange(plot_chlorides, plot_so2, plot_ph, plot_alcohol, ncol = 2)
 ```
+
+No gráfico 5, acho que dá para melhorar a visualização se colocarmos a escala em log10. Vamos ver como fica:
+
+```{r}
+plot_res_sugar <- ggplot(wineQualityReds, aes(x = residual.sugar))+
+                    geom_histogram(color = "white", fill = "#3366FF") +
+                    ylab('Frequency') + 
+                    xlab('Residual Sugar (g / dm^3)') +
+                    labs(title='5- Residual Sugar Histogram') +
+                    scale_x_log10()
+
+plot_res_sugar
+```
+
+Dessa maneira nossa visualização ficou realmente muito mais clara :D
+
+```{r}
+grid.arrange(plot_fix_acid, plot_vol_acid, plot_cit_acid, plot_res_sugar, ncol = 2)
+```
+
 
 ### Algumas observações:
 
@@ -249,7 +269,7 @@ Abaixo vou fazer um plot disso e você vai poder perceber o quão mais fácil fi
 ```{r}
 library(ellipse)
 #craete new dataframe without categorical vars 
-numeric_vars <- names(wineQualityReds) %in% c("quality.label", "rn")
+numeric_vars <- names(wineQualityReds) %in% c("quality.label", "rn", "X1")
 rw_num <- wineQualityReds[!numeric_vars]
 ctab <- cor(rw_num)
 #plot which show correlation in more convenient way
@@ -510,15 +530,15 @@ final_plot_two_1 = ggplot(data = wineQualityReds,
                           coord_cartesian(ylim = c(0.4, 0.9)) +
                           theme(legend.justification = c(1, 0), 
                                 legend.position = c(1, 0))
-
-final_plot_two_2 = point_plot_func(x_str = "citric.acid", 
-                                   y_str = "sulphates", 
-                                   yl = "Sulphates (g / dm^3)", 
-                                   xl = "Citric Acid (g / dm^3)", 
-                                   t = "Sulphates vs Citric Acid by Quality") +
-                                  coord_cartesian(ylim = c(0.2, 1.2)) + 
-                                  theme(legend.justification = c(1, 0), 
-                                        legend.position = c(1, 0))
+plotData = subset(wineQualityReds, quality.label != 'bom')
+final_plot_two_2 = ggplot( data = plotData, aes_string(x = plotData$citric.acid, 
+                          y = plotData$sulphates, 
+                          color = plotData$quality.label)) +
+                          geom_point(size = 3, alpha = 0.5, position = "jitter")+
+                          xlab('Citric Acid (g / dm^3)')+
+                          ylab('Sulphates (g / dm^3)')+    
+                          ggtitle('Sulphates vc Citric Acid by Quality') +
+                          scale_color_brewer(palette="Set1", guide = guide_legend(title = 'Quality', reverse = T))
 
 grid.arrange(final_plot_two_1, final_plot_two_2, ncol = 2)
 ```
@@ -531,22 +551,7 @@ No segundo gráfico vemos que em geral, vinhos bons possuem o nível de *sulphat
 Outra observação é em relação ao segundo gráfico, que mostra a relação entre o nível de *sulphates* e *citric.acid*. 
 Podemos perceber que vinhos classicados como ótimo em geral possuem um maior nível de *citric.acid* e também de *sulphates*. 
 
-Um ponto de observação é em relação ao gráfico *Sulphates vc Citric Acid by Quality*. Ele está um tanto quanto poluído. Irei fazê-lo novamente, porém agora somente com vinhos *ótimos* e *ruins*:
-
-```{r}
-plotData = subset(wineQualityReds, quality.label != 'bom')
-ggplot( data = plotData, aes_string(x = plotData$citric.acid, 
-                                    y = plotData$sulphates, 
-                                    color = plotData$quality.label)) +
-                geom_point(size = 3, alpha = 0.5, position = "jitter")+
-                xlab('Citric Acid (g / dm^3)')+
-                ylab('Sulphates (g / dm^3)')+    
-                ggtitle('Sulphates vc Citric Acid by Quality') +
-                scale_color_brewer(palette="Set1", guide = guide_legend(title = 'Quality', reverse = T))
-```
-
-Agora sim conseguimos ver de maneira clara como essas duas variáveis estão relacionadas e interferem na qualidade do vinho! :)
-Basicamente quando o nível de *sulphates* é menor do que 0.6, o vinho, em geral, não é de qualidade boa! (como mencionei acima)
+Um ponto de observação é em relação ao gráfico *Sulphates vc Citric Acid by Quality*. Quando fiz a primeira vez, ele estava um tanto quanto poluído. Por isso eu retirei os vinhos *bons* e mantive somente com vinhos *ótimos* e *ruins*, dessa maneira a visualização ficou muito mais clara! :D
 
 ### Terceiro Gráfico
 ```{r}
