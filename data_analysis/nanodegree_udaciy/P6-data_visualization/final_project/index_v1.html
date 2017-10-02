@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+
+  <style> 
+circle.dimple-series-1 {
+  fill : red;
+}
+ h2 {
+  text-align: center;
+ }
+  </style>
+    <script type="text/javascript">
+      function draw(data) {
+      
+      /*
+        D3.js setup code
+      */
+          "use strict";
+          var margin = 75,
+              width = 1400 - margin,
+              height = 600 - margin;
+          d3.select("body")
+          .append("h2")
+          .text("Total US Flight Operations 2015");
+        //debugger;
+          var flight_svg = d3.select("body")
+            .append("svg")
+              .attr("width", width + margin)
+              .attr("height", height + margin)
+            .append('g')
+                .attr('class','chart');
+      /*
+        Dimple.js Chart construction code
+      */
+          //debugger;
+          var flightChart = new dimple.chart(flight_svg, data);
+          var x = flightChart.addTimeAxis("x", "month", "%m", "%b");
+          var y1 =  flightChart.addMeasureAxis("y", "on_time_flights");
+          flightChart.addSeries("On Time Flights", dimple.plot.line, [x,y1]);
+          function addFlightMeasure(col, label){
+            var y_add = flightChart.addMeasureAxis(y1, col);
+            flightChart.addSeries(label, dimple.plot.line, [x,y_add]);
+          }
+          addFlightMeasure("carrier_ct", "Carrier Delay");
+          addFlightMeasure("weather_ct", "Weather Delay");
+          addFlightMeasure("nas_ct", "Nas Delay");
+          addFlightMeasure("security_ct", "Security Delay");
+          addFlightMeasure("late_aircraft_ct", "Late Aircraft Delay");
+          flightChart.addLegend("10%,20px",10,"left");
+          d3.select("body")
+          .append("h2")
+          .text("Total US Minutes Delay Flight Operations 2015");
+          var delay_svg = d3.select("body")
+            .append("svg")
+              .attr("width", width + margin)
+              .attr("height", height + margin)
+            .append('g')
+                .attr('class','chart');
+      /*
+        Dimple.js Chart construction code
+      */
+          //debugger;
+          var delayChart = new dimple.chart(delay_svg, data);
+          var x_d = delayChart.addTimeAxis("x", "month", "%m", "%b");
+          // var x_d = delayChart.addCategoryAxis("x", "custom_month");
+          x_d.addOrderRule("month")
+          var y1_d =  delayChart.addMeasureAxis("y", "arr_delay");
+          delayChart.addSeries("Total Delay", dimple.plot.line, [x_d,y1_d]);
+          function addDelayMeasure(col, label){
+            var y_add = delayChart.addMeasureAxis(y1_d, col);
+            var ser = delayChart.addSeries(label, dimple.plot.line, [x_d,y_add]);
+          }
+          addDelayMeasure("carrier_delay", "Carrier Delay");
+          addDelayMeasure("weather_delay", "Weather Delay");
+          addDelayMeasure("nas_delay", "Nas Delay");
+          addDelayMeasure("security_delay", "Security Delay");
+          addDelayMeasure("late_aircraft_delay", "Late Aircraft Delay");
+          delayChart.addLegend("10%,20px",10,"left");
+          flightChart.draw();
+          delayChart.draw();
+          // debugger;
+        };
+      </script>
+  </head>
+<body>
+  <script type="text/javascript">
+  /*
+    Use D3 (not dimple.js) to load the TSV file
+    and pass the contents of it to the draw function
+    */
+  d3.csv("data/month_sum_airlines_2015.csv", draw);
+  </script>
+</body>
+</html>
